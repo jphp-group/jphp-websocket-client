@@ -1,0 +1,44 @@
+apply plugin: "java"
+apply plugin: "idea"
+apply plugin: "eclipse"
+
+version '1.0.6'
+
+compileJava {
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+}
+
+sourceSets {
+    main.java.srcDirs = ['src-jvm/main/java']
+    main.resources.srcDirs = ['src-jvm/main/resources']
+}
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+  jcenter()
+  maven { url 'https://oss.sonatype.org/content/groups/public' }
+}
+
+configurations { provided }
+
+sourceSets { main { compileClasspath += configurations.provided } }
+
+dependencies {
+  provided files('jars/x-Java-WebSocket-1.3.8.jar')
+  provided files('jars/x-jphp-websocket-client-1.0.6.jar')
+  provided files('vendor/jphp-runtime/jars/jphp-runtime-1.0.3.jar')
+  compile 'org.java-websocket:Java-WebSocket:1.3.8'
+}
+
+jar {
+   destinationDir = file('jars/')
+   baseName = 'x-jphp-websocket-client'
+}
+
+task copyJars(type: Copy) {
+  from project.configurations.compile
+  into file(projectDir.path + '/jars/')
+  rename { name -> 'x-' + name }
+}

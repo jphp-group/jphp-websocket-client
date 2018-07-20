@@ -1,0 +1,15 @@
+<element extends="ide\scripts\elements\AbstractComponent">
+    <init>
+
+    </init>
+    <properties>
+        <property code="url" name="URL" editor="text" tooltip="URL для подключения к WebSocket" />
+    </properties>
+
+    <eventTypes>
+        <eventType code="open" name="Открытие" kind="ObjectEvent" icon="icons/ok16.png" />
+        <eventType code="error" name="Ошибка" kind="ObjectEvent" icon="icons/error16.png" />
+        <eventType code="message" name="Сообщение" kind="ObjectEvent" icon="icons/chat16.png" />
+        <eventType code="close" name="Закрытие" kind="ObjectEvent" icon="icons/bulletRed16.png" />
+    </eventTypes>
+</element>
