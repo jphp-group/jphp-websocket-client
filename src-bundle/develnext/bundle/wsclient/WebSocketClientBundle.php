@@ -16,21 +16,9 @@ class WebSocketClientBundle extends AbstractJarBundle
     public function onAdd(Project $project, AbstractBundle $owner = null)
     {
         parent::onAdd($project, $owner);
-
-        $format = Ide::get()->getRegisteredFormat(ScriptModuleFormat::class);
-
-        if($format){
-            $format->register(new WebSocketClientComponent());
-        }
     }
     public function onRemove(Project $project, AbstractBundle $owner = null){
         parent::onRemove($project, $owner);
-
-        $format = Ide::get()->getRegisteredFormat(ScriptModuleFormat::class);
-
-        if($format){
-            $format->unregister(new WebSocketClientComponent());
-        }
     }
 
     public function onRegister(IdeLibraryBundleResource $resource){

@@ -2,7 +2,7 @@ apply plugin: "java"
 apply plugin: "idea"
 apply plugin: "eclipse"
 
-version '1.1.4'
+version '1.1.5'
 
 compileJava {
     sourceCompatibility = '1.8'
@@ -26,7 +26,7 @@ configurations { provided }
 sourceSets { main { compileClasspath += configurations.provided } }
 
 dependencies {
-  provided files('jars/x-jphp-websocket-client-1.1.4.jar')
+  provided files('jars/x-jphp-websocket-client-1.1.5.jar')
   provided files('jars/x-nv-websocket-client-2.6.jar')
   provided files('vendor/jphp-runtime/jars/jphp-runtime-1.0.3.jar')
   compile 'com.neovisionaries:nv-websocket-client:2.6'
