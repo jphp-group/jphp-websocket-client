@@ -36,8 +36,8 @@ class WebSocketClientBundle extends AbstractJarBundle
     public function onRegister(IdeLibraryBundleResource $resource){
         parent::onRegister($resource);
 
-        foreach(File::of($resource->getPath())->findFiles() as $file){
-            Runtime::addJar($file);
-        }
+//        foreach(File::of($resource->getPath())->findFiles() as $file){
+//            Runtime::addJar($file);
+//        }
     }
 }

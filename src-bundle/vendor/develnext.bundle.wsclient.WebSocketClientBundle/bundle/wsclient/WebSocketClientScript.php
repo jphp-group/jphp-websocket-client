@@ -5,70 +5,126 @@ namespace bundle\wsclient;
 
 
 use php\gui\framework\AbstractScript;
+use php\lib\str;
+use php\net\URL;
 use php\net\websocket\WebSocket;
+use php\net\websocket\WebSocketException;
+use php\net\websocket\WebSocketFrame;
 
 class WebSocketClientScript extends AbstractScript
 {
+    /**
+     * @var string
+     */
     public $url;
+    /**
+     * @var int
+     */
+    public $connectionTimeout;
+    /**
+     * @var string
+     */
+    public $proxyHost;
+    /**
+     * @var int
+     */
+    public $proxyPort;
+    /**
+     * @var string
+     */
+    public $proxyPassword;
+    /**
+     * @var bool
+     */
+    public $proxySecure;
     /**
      * @var array
      */
     public $headers = [];
+
+
     /**
      * @var WebSocket
      */
     private $client;
 
+
     function __construct(){
         $this->client = new WebSocket();
-        $this->client->on('open', function($statusCode, $statusMessage, $headers){
-            $this->trigger('open', ['statusCode' => $statusCode, 'message' => $statusMessage, 'headers' => $headers]);
+        $this->client->on('connected', function($headers){
+            $this->trigger('connected', ['headers' => $headers]);
         });
-        $this->client->on('close', function($statusCode, $statusMessage, $remote){
-            $this->trigger('close', ['statusCode' => $statusCode, 'message' => $statusMessage, 'remote' => $remote]);
+        $this->client->on('connectError', function(WebSocketException $error){
+            $this->trigger('connectError', ['error' => $error]);
         });
-        $this->client->on('message', function($message){
-            $this->trigger('message', ['message' => $message]);
+        $this->client->on('frame', function(WebSocketFrame $frame){
+            $this->trigger('frame', ['frame' => $frame]);
         });
-        $this->client->on('error', function($error){
-            $this->trigger('error', ['error' => $error]);
+        $this->client->on('textMessage', function(string $textMessage){
+            $this->trigger('textMessage', ['textMessage' => $textMessage]);
+        });
+        $this->client->on('stateChanged', function($state){
+            $this->trigger('stateChanged', ['state' => $state]);
+        });
+        $this->client->on('disconnected', function(WebSocketFrame $serverCloseFrame, WebSocketFrame $clientCloseFrame, bool $closedByServer){
+            $this->trigger('disconnected', ['serverCloseFrame' => $serverCloseFrame, 'clientCloseFrame' => $clientCloseFrame, 'closedByServer' => $closedByServer]);
         });
     }
+
+    /**
+     * @throws \php\io\IOException
+     */
     function connect(){
-        $this->_connect(false);
-    }
-    function connectAsync(){
-        $this->_connect(true);
-    }
-    private function _connect(bool $async){
-        $this->client->url = $this->url;
         $this->client->clearHeaders();
         if(is_array($this->headers)){
-            $this->client->addHeaders($this->headers);
+            foreach($this->headers as $name => $header){
+                if(is_iterable($header)){
+                    foreach($header as $item){
+                        $this->client->addHeader($name, $item);
+                    }
+                }
+                else{
+                    $this->client->addHeader($name, $header);
+                }
+            }
         }
-        if($async){
-            $this->client->connectAsync();
+        else if(is_string($this->headers)){
+            foreach(str::split($this->headers, "\n") as $headerPart){
+                [$key, $value] = str::split($headerPart, ':');
+                $this->client->addHeader(str::trim($key), str::trim($value));
+            }
         }
-        else{
-            $this->client->connect();
-        }
+        $this->client->connect($this->url);
     }
-    function close(int $code = null, string $message = null){
+    /**
+     * @param int|null $code
+     * @param string|null $message
+     * @throws \php\io\IOException
+     */
+    function disconnect(int $code = null, string $message = null){
         if(func_num_args() == 0){
-            $this->client->close();
+            $this->client->disconnect();
         }
         elseif(func_num_args() == 1){
-            $this->client->close($code);
+            $this->client->disconnect($code);
         }
         else{
-            $this->client->close($code, $message);
+            $this->client->disconnect($code, $message);
         }
     }
-    function send(string $text){
-        $this->client->send($text);
+    /**
+     * @param string $text
+     * @throws \php\io\IOException
+     */
+    function sendText(string $text){
+        $this->client->sendText($text);
     }
-    function sendTextFrame(string $text, bool $isFinal){
-        $this->client->sendTextFrame($text, $isFinal);
+    /**
+     * @param WebSocketFrame $frame
+     * @throws \php\io\IOException
+     */
+    function sendFrame(WebSocketFrame $frame){
+        $this->client->sendFrame($frame);
     }
 
     /**

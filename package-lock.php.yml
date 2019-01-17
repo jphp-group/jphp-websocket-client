@@ -1,9 +1,9 @@
 dependencies:
   jphp-runtime:
-    version: 1.0.4
+    version: 1.0.7
     info:
-      sha256: ba9ec5bc7e795cee9ebf2e0cb0e7aade9cbeb6d5e603d67e1aee435987e5ffca
-      size: 1816951
+      sha256: 36ed7baf5e61332446d93c67354e5fa4d159dd71a19443208fbed12ee44cf962
+      size: 1817288
       repo: http://api.develnext.org
   jphp-core:
     version: 1.0.4
